@@ -1,27 +1,25 @@
+import path from 'path'
+import { readFileSync } from 'fs'
+
 import express from 'express'
-import { buildSchema } from 'graphql'
-import { ruruHTML } from 'ruru/server'
+
 import { createHandler } from 'graphql-http/lib/use/express'
+import { makeExecutableSchema } from '@graphql-tools/schema'
+import { ruruHTML } from 'ruru/server'
 
-const schema = buildSchema(`
-  type Query {
-    hello: String
-  }
-`)
+import { resolvers } from './resolvers'
 
-
-const rootValue = {
-  hello: () => {
-    return 'Hello, world!'
-  },
-}
+const typeDefs = readFileSync(path.join(__dirname, './schemas/todo/todoTypes.gql'), 'utf8')
 
 const app = express()
 
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers
+})
 
 const handler = createHandler({
-  schema,
-  rootValue,
+  schema
 })
 
 app.all(
@@ -34,7 +32,7 @@ app.get("/", (_req, res) => {
   res.end(ruruHTML({ endpoint: "/graphql" }))
 })
 
-const PORT = 4000
+const PORT = process.env.APP_PORT ?? 4000
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`)

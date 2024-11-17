@@ -8,3 +8,12 @@ dist
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+
+# env files
+!.env
+!.env.development
+!.env.production
+!.env.test
+
+*.local
